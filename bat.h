@@ -14,5 +14,4 @@ public:
 	}
 	sf::RectangleShape getShape() { return rect; }
 	sf::FloatRect getHitBox() { return rect.getGlobalBounds(); }
-    
-};
+ };
