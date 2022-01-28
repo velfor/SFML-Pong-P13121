@@ -7,9 +7,10 @@ Ball::Ball() {
 	circle.setFillColor(sf::Color::Yellow);
 }
 sf::CircleShape Ball::getShape() { return circle; }
-float Ball::getSpeedx() { return speedx; }
-float Ball::getSpeedy() { return speedy; }
+void Ball::reboundHorizontal() { speedx = -speedx; }
+void Ball::reboundVertical() { speedy = -speedy; }
 sf::Vector2f Ball::getPosition() { return circle.getPosition(); }
+sf::FloatRect Ball::getHitBox() { return circle.getGlobalBounds(); }
 void Ball::update() {
 	circle.move(speedx,speedy);
 	if (getPosition().x <= 0 || getPosition().x + 2 * radius >= SCREEN_WIDTH){

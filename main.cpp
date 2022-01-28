@@ -2,17 +2,22 @@
 #include "const.h"
 #include "ball.h"
 #include "bat.h"
-//#include "left_bat.h"
+#include "left_bat.h"
+#include "right_bat.h"
 
 using namespace sf;
 int main()
 {
 	// Объект, который, собственно, является главным окном приложения
-	RenderWindow window(VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "SFML Works!");
+	RenderWindow window(
+		VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), 
+		"ITSteps SFML Pong"
+	);
 	window.setFramerateLimit(FPS);
 	//Создание игровых объектов
 	Ball ball;
-	Bat left_bat(20, SCREEN_HEIGHT/2 - 50);
+	LeftBat left_bat(20, SCREEN_HEIGHT/2 - 50);
+	RightBat right_bat(SCREEN_WIDTH - 40, SCREEN_HEIGHT / 2 - 50);
 	// Главный цикл приложения. Выполняется, пока открыто окно
 	while (window.isOpen())
 	{
@@ -28,10 +33,17 @@ int main()
 		//2 update
 		ball.update();
 		left_bat.update();
+		right_bat.update();
+		//обработка столкновений
+		//если прямоугольник мяча пересекается с прямоугольником левой биты
+		if (ball.getHitBox().intersects(left_bat.getHitBox())) {
+			ball.reboundHorizontal();
+		}
 		// Отрисовка окна
-		window.clear(Color(60,60,60,0));
+		window.clear(Color(60,60,60));
 		window.draw(ball.getShape());
 		window.draw(left_bat.getShape());
+		window.draw(right_bat.getShape());
 		window.display();
 	}
 	return 0;
