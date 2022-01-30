@@ -14,4 +14,7 @@ public:
 	}
 	sf::RectangleShape getShape() { return rect; }
 	sf::FloatRect getHitBox() { return rect.getGlobalBounds(); }
+	sf::Vector2f getPosition() { return rect.getPosition(); }
+	int getHeight() { return height; }
+	int getWidth() { return width; }
  };

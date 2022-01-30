@@ -9,6 +9,8 @@
 using namespace sf;
 int main()
 {
+	enum GameState {INTRO, PLAY, GAME_OVER};
+	GameState game_state = INTRO;
 	// Объект, который, собственно, является главным окном приложения
 	RenderWindow window(
 		VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), 
@@ -21,6 +23,7 @@ int main()
 	RightBat right_bat(SCREEN_WIDTH - 40, SCREEN_HEIGHT / 2 - 50);
 	TextObj left_score(SCREEN_WIDTH /5, 20);
 	TextObj right_score(4*SCREEN_WIDTH /5, 20);
+	TextObj intro_text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	// Главный цикл приложения. Выполняется, пока открыто окно
 	while (window.isOpen())
 	{
@@ -32,29 +35,69 @@ int main()
 			if (event.type == Event::Closed)
 				// тогда закрываем его
 				window.close();
+			if (event.type == Event::KeyPressed) {
+				if (event.key.code == Keyboard::Space) {
+					game_state = PLAY;
+				}
+			}
 		}
 		//2 update
-		ball.update();
-		left_bat.update();
-		right_bat.update();
-		left_score.update(std::to_string(ball.getLeftScore()));
-		right_score.update(std::to_string(ball.getRightScore()));
-		//обработка столкновений
-		//если прямоугольник мяча пересекается с прямоугольником левой биты
-		if (ball.getHitBox().intersects(left_bat.getHitBox())) {
-			ball.reboundHorizontal();
+		switch (game_state) {
+		case INTRO:
+			intro_text.update("PONG");
+			window.clear(Color(60, 60, 60));
+			window.draw(intro_text.getText());
+			window.display();
+			break;
+		case PLAY:
+			ball.update();
+			left_bat.update();
+			right_bat.update();
+			left_score.update(std::to_string(ball.getLeftScore()));
+			right_score.update(std::to_string(ball.getRightScore()));
+			//обработка столкновений
+			//если прямоугольник мяча пересекается с прямоугольником левой биты
+			if (ball.getHitBox().intersects(left_bat.getHitBox())) {
+				//удар сверху
+				if (left_bat.getHitBox().contains(ball.getMidBottom())) {
+					//выталкиваем мяч из ракетки по оси У вверх
+					ball.setPosition(sf::Vector2f(ball.getPosition().x,
+						left_bat.getPosition().y - 2 * ball.getRadius()));
+					ball.reboundVertical();
+				}
+				//удар справа
+				else if (left_bat.getHitBox().contains(ball.getMidLeft())) {
+					ball.setPosition(sf::Vector2f(
+						left_bat.getPosition().x + left_bat.getWidth(),
+						ball.getPosition().y));
+					ball.reboundHorizontal();
+				}
+				//удар снизу
+				else if (left_bat.getHitBox().contains(ball.getMidTop())) {
+					//выталкиваем мяч из ракетки по оси У вниз
+					ball.setPosition(sf::Vector2f(ball.getPosition().x,
+						left_bat.getPosition().y + left_bat.getHeight()));
+					ball.reboundVertical();
+				}
+			}
+			if (ball.getHitBox().intersects(right_bat.getHitBox())) {
+				ball.reboundHorizontal();
+			}
+
+			// Отрисовка окна
+			window.clear(Color(60, 60, 60));
+			window.draw(ball.getShape());
+			window.draw(left_bat.getShape());
+			window.draw(right_bat.getShape());
+			window.draw(left_score.getText());
+			window.draw(right_score.getText());
+			window.display();
+			break;
+		case GAME_OVER:
+
+			break;
 		}
-		if (ball.getHitBox().intersects(right_bat.getHitBox())) {
-			ball.reboundHorizontal();
-		}
-		// Отрисовка окна
-		window.clear(Color(60,60,60));
-		window.draw(ball.getShape());
-		window.draw(left_bat.getShape());
-		window.draw(right_bat.getShape());
-		window.draw(left_score.getText());
-		window.draw(right_score.getText());
-		window.display();
+		
 	}
 	return 0;
 }
